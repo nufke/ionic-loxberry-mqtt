@@ -1,19 +1,29 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      LoxBerry MQTT
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
-  <ion-card *ngFor="let topic of topics">
-    <ion-card-header>
-      {{topic.name}}
-    </ion-card-header>
+  
+  <ion-card *ngFor="let control of sortControls()">
     <ion-card-content>
-      {{topic.message}}
+      <ion-item>
+        <ion-avatar>
+          <ion-icon name="bulb"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h1>{{control.name}}</h1>
+          <h2>{{control.state.message}}</h2>
+        </ion-label>
+        <ng-container *ngIf="control.type === 'push'">
+          <ion-fab-button class="fab-button" size="small" (click)="pushed($event)">
+            <ion-icon name="radio-button-off-outline"></ion-icon>
+          </ion-fab-button>
+        </ng-container>
+      </ion-item>
     </ion-card-content>
   </ion-card>
 
