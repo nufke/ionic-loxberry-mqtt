@@ -38,6 +38,7 @@
     "type": "text",
     "room": "Dining Room",
     "category": "Sensor",
+    "is_favorite": true,
     "priority": 2,
     "state": {
       "value": "waiting for value...",

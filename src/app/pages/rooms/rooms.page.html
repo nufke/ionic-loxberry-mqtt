@@ -1,0 +1,81 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Categories
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Categories</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-grid>
+    <ng-container *ngFor="let room of rooms">
+
+      <ion-row>
+        <ion-label>
+          <p translate>{{room}}</p>
+        </ion-label>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="12" size-md="6" *ngFor="let control of filterControls(room)">
+          <ion-card>
+            <ion-card-content>
+              <ion-item>
+                <ion-avatar>
+                  <ion-icon name="{{control.icon.name}}"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <h1>{{control.name}}</h1>
+                  <h2>{{control.state.message}}</h2>
+                </ion-label>
+
+                <ng-container *ngIf="control.type === 'push'">
+                  <ion-fab-button class="fab-button" size="small" (click)="pushed($event, control)">
+                    <ion-icon name="radio-button-off-outline"></ion-icon>
+                  </ion-fab-button>
+                </ng-container>
+
+                <ng-container *ngIf="control.type === 'radio'">
+                  <ion-fab-button class="fab-button" size="small" (click)="pushed_radio($event, control)">
+                    <ion-icon name="add-outline"></ion-icon>
+                  </ion-fab-button>
+                </ng-container>
+
+                <ng-container *ngIf="control.type === 'updown'">
+                  <ion-fab-button class="fab-button-2" size="small" (click)="pushed_down($event, control)">
+                    <ion-icon name="chevron-down-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button class="fab-button-1" size="small" (click)="pushed_up($event, control)">
+                    <ion-icon name="chevron-up-outline"></ion-icon>
+                  </ion-fab-button>
+                </ng-container>
+
+                <ng-container *ngIf="control.type === 'plusminus'">
+                  <ion-fab-button class="fab-button-2" size="small" (click)="pushed_minus($event, control)">
+                    <ion-icon name="remove-outline"></ion-icon>
+                  </ion-fab-button>
+                  <ion-fab-button class="fab-button-1" size="small" (click)="pushed_plus($event, control)">
+                    <ion-icon name="add-outline"></ion-icon>
+                  </ion-fab-button>
+                </ng-container>
+
+                <ng-container *ngIf="control.type === 'switch'">
+                    <ion-toggle mode="ios" [(ngModel)]="_toggle_on" (click)="toggle($event, control)">
+                    </ion-toggle>
+                </ng-container>
+
+              </ion-item>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+  </ion-grid>
+
+</ion-content>

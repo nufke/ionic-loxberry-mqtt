@@ -1,16 +1,17 @@
-import { Component, ViewChild } from '@angular/core';
-import { LoxBerry } from '../providers/loxberry';
-import { Control } from '../interfaces/control'
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { LoxBerry } from '../../providers/loxberry';
+import { Control } from '../../interfaces/control'
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: 'app-favorites',
+  templateUrl: 'favorites.page.html',
+  styleUrls: ['favorites.page.scss']
 })
-export class HomePage {
+export class FavoritesPage implements OnInit, OnDestroy {
+
   public controls: Control[];
 
-  public rooms: string[];
+  public favorites: Control[];
 
   constructor(public LoxBerryService: LoxBerry) {
     this.controls = [];
@@ -18,19 +19,16 @@ export class HomePage {
     this.LoxBerryService.load().subscribe((controls: Control[]) => {
       this.controls = controls;
 
-      this.rooms = this.controls.map(item => item.room)
-        .filter((value, index, self) => self.indexOf(value) === index)
-        .sort((a, b) => { return a.localeCompare(b); })
+      this.favorites = this.controls.filter(item => item.is_favorite)
+        .sort((a, b) => { return a.name.localeCompare(b.name); })
     });
+  }
+
+  public ngOnInit() : void {
   }
 
   public ngOnDestroy() : void {
     this.LoxBerryService.unload();
-  }
-
-  public filterControls(room: any) : Control[] {
-    var filteredControls =  this.controls.filter( (resp) => { return resp.room == room });
-    return filteredControls.sort( (a, b) => { return a.priority - b.priority });
   }
 
   pushed($event, control) {
@@ -74,4 +72,6 @@ export class HomePage {
     $event.stopPropagation();
     console.log('toggle', control);
   }
+
+
 }

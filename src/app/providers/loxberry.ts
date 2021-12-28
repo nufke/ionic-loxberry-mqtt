@@ -14,10 +14,8 @@ import { Control } from '../interfaces/control'
 })
 export class LoxBerry {
 
-  data: any;
-  
   private subscription: Subscription[] = [];
-  public controls: Control[];
+  private controls: Control[];
 
   constructor(private http: HttpClient,
               private _mqttService: MqttService) {
@@ -33,9 +31,8 @@ export class LoxBerry {
     }
   }
 
-  private registerControls(controls: any) {
+  private registerControls(controls: Control[]) {
     this.controls = controls;
-    
     // loop through all controls
     this.controls.forEach( (control) => {
       console.log(control.id);
@@ -97,7 +94,9 @@ export class LoxBerry {
       this.subscription.push( this._mqttService.observe(control.id+'/state/color').subscribe((message: IMqttMessage) => {
         control.state.color = message.payload.toString();
       }));  
+
     }); //forEach
+
     return this.controls;
   }
 
