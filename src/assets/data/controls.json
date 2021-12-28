@@ -1,13 +1,13 @@
 [
   {
-    "id": "test/sensor1",
-    "name": "Sensor 1",
+    "id": "test/light1",
+    "name": "Light switch",
     "icon": {
       "name": "bulb"
     },
-    "type": "text",
+    "type": "switch",
     "room": "Living Room",
-    "category": "Sensors",
+    "category": "Lighting",
     "priority": 1,
     "state": {
       "value": "waiting for value...",
@@ -15,14 +15,29 @@
       }
   },
   {
-    "id": "test/sensor2",
-    "name": "Sensor 2",
+    "id": "test/light2",
+    "name": "Light Dimmer",
     "icon": {
       "name": "bulb"
     },
+    "type": "radio",
+    "room": "Dining Room",
+    "category": "Lighting",
+    "priority": 2,
+    "state": {
+      "value": "waiting for value...",
+      "format": "%s"
+      }
+  },
+  {
+    "id": "test/sensor1",
+    "name": "Temperature",
+    "icon": {
+      "name": "thermometer-outline"
+    },
     "type": "text",
-    "room": "Living Room",
-    "category": "Sensors",
+    "room": "Dining Room",
+    "category": "Sensor",
     "priority": 2,
     "state": {
       "value": "waiting for value...",
