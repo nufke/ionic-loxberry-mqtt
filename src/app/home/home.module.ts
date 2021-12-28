@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
-
+import { LoxBerry } from '../providers/loxberry';
 
 @NgModule({
   imports: [
@@ -14,6 +14,11 @@ import { HomePageRoutingModule } from './home-routing.module';
     IonicModule,
     HomePageRoutingModule
   ],
-  declarations: [HomePage]
+  declarations: [
+    HomePage
+  ],
+  providers: [
+    LoxBerry
+  ],
 })
 export class HomePageModule {}

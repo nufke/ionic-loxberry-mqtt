@@ -1,0 +1,32 @@
+[
+  {
+    "id": "test/sensor1",
+    "name": "Sensor 1",
+    "icon": {
+      "name": "bulb"
+    },
+    "type": "text",
+    "room": "Living Room",
+    "category": "Sensors",
+    "priority": 1,
+    "state": {
+      "value": "waiting for value...",
+      "format": "%s"
+      }
+  },
+  {
+    "id": "test/sensor2",
+    "name": "Sensor 2",
+    "icon": {
+      "name": "bulb"
+    },
+    "type": "text",
+    "room": "Living Room",
+    "category": "Sensors",
+    "priority": 2,
+    "state": {
+      "value": "waiting for value...",
+      "format": "%s"
+      }
+  }
+]
