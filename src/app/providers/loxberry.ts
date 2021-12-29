@@ -25,10 +25,10 @@ export class LoxBerry {
 
   constructor(private http: HttpClient,
               private _mqttService: MqttService) {
-    this.registerControlTopic();
+    this.registerControlRootTopic();
   }
 
-  public findTopic(val:string) {
+  private findTopic(val:string) {
     for(var i = 0; i < this.controls.length; i++) { // loop through array index (1st level only)
       if (this.controls[i].topic === val) return i;
     }
@@ -38,7 +38,6 @@ export class LoxBerry {
   private addControl(obj: any, topic: string) {
     var data = obj;
     var idx = this.findTopic(topic);
-    console.log(idx);
     if (idx >= 0) {
       this.controls[idx] = obj; // Override full object in array
       this.controls[idx].state.message = util.format(obj.state.format, obj.state.value);
@@ -48,86 +47,47 @@ export class LoxBerry {
       data.state.message = util.format(obj.state.format, obj.state.value);
       this.controls.push(data); // Add new object to array
     }
- 
-    this._controls.next(this.controls);
+    this._controls.next(this.controls); // updates for Subscribers
   }
 
-  private registerControlTopic() {
+  public registerControlTopics(obj, root_topic, root) {
+    for(var key in obj){ 
+       if (typeof obj[key] === "object") {
+         this.registerControlTopics(obj[key], root_topic, key+'/')
+       }
+       else {
+         if (key === 'topic' ) break;
+         var nested_topic = root_topic+'/'+root+key;
+         this.subscription.push( this._mqttService.observe(nested_topic)
+           .subscribe((message: IMqttMessage) => {
+             var idx = this.findTopic(root_topic);
+             // extract name of fields from MQTT topic name
+             var sub_topic = message.topic.replace(this.controls[idx].topic+'/', '').split('/');
+             if (sub_topic.length==2) {
+               //console.log("debug1: " , sub_topic, idx);
+               this.controls[idx][sub_topic[0]][sub_topic[1]] = message.payload.toString();
+             }
+             else { 
+               //console.log("debug2: " ,sub_topic, idx);
+               this.controls[idx][sub_topic[0]] = message.payload.toString();
+             }
+             this._controls.next(this.controls); // updates for Subscribers
+        }));
+        //console.log('registered to nested topic', nested_topic);
+      }
+    }
+  }
+
+  private registerControlRootTopic() {
     this.subscription.push( this._mqttService.observe('loxberry/app/control/+/json')
       .subscribe((message: IMqttMessage) => {
-        var topic_str = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
+        var root_topic = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
         var obj = JSON.parse(message.payload.toString());
-        this.addControl(obj, topic_str);
-        console.log('subscribed to ', topic_str, obj);
+        this.addControl(obj, root_topic);
+        //console.log('subscribed to root topic: ', root_topic);
+        this.registerControlTopics(obj, root_topic,'');
     }));
     
-     /*
-    // loop through all controls
-
-     this.controls.forEach( (control) => {
-      console.log(control.id);
-      // TODO: refactor in more efficient function
-      this.subscription.push( this._mqttService.observe(control.id).subscribe((message: IMqttMessage) => {
-        control.state.value = message.payload.toString();
-        control.state.message = message.payload.toString();
-        if (Number(control.state.value)) 
-          control.state.value = Number(control.state.value);
-        if (control.state.format.length)
-          control.state.message = util.format(control.state.format,control.state.value);
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/name').subscribe((message: IMqttMessage) => {
-        control.name = message.payload.toString();
-      }));
-     
-      this.subscription.push( this._mqttService.observe(control.id+'/icon/name').subscribe((message: IMqttMessage) => {
-        control.icon.name = message.payload.toString();
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/icon/color').subscribe((message: IMqttMessage) => {
-        control.icon.color = message.payload.toString();
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/icon/href').subscribe((message: IMqttMessage) => {
-        control.icon.href = message.payload.toString();
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/type').subscribe((message: IMqttMessage) => {
-        control.type = message.payload.toString();
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/room').subscribe((message: IMqttMessage) => {
-        control.room = message.payload.toString();
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/category').subscribe((message: IMqttMessage) => {
-        control.category = message.payload.toString();
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/is_favorite').subscribe((message: IMqttMessage) => {
-        control.is_favorite = (message.payload.toString() === '1');
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/is_visible').subscribe((message: IMqttMessage) => {
-        control.is_visible = (message.payload.toString() === '1');
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/is_protected').subscribe((message: IMqttMessage) => {
-        control.is_protected = (message.payload.toString() === '1');
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/priority').subscribe((message: IMqttMessage) => {
-        control.priority = Number(message.payload.toString());
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/state/value').subscribe((message: IMqttMessage) => {
-        control.state.value = message.payload.toString();
-        control.state.message = message.payload.toString();
-        if (Number(control.state.value)) 
-          control.state.value = Number(control.state.value);
-        if (control.state.format.length)
-          control.state.message = util.format(control.state.format,control.state.value);
-        }));
-      this.subscription.push( this._mqttService.observe(control.id+'/state/format').subscribe((message: IMqttMessage) => {
-        control.state.format = message.payload.toString();
-        if (control.state.format.length)
-          control.state.message = util.format(control.state.format,control.state.value);
-      }));
-      this.subscription.push( this._mqttService.observe(control.id+'/state/color').subscribe((message: IMqttMessage) => {
-        control.state.color = message.payload.toString();
-      }));  
-
-    }); //forEach
-*/
     return this.controls;
   }
 
