@@ -16,10 +16,10 @@ export class FavoritesPage implements OnInit, OnDestroy {
   constructor(public LoxBerryService: LoxBerry) {
     this.controls = [];
 
-    this.LoxBerryService.load().subscribe((controls: Control[]) => {
+    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
       this.controls = controls;
 
-      this.favorites = this.controls.filter(item => item.is_favorite)
+      this.favorites = controls.filter(item => item.is_favorite)
         .sort((a, b) => { return a.name.localeCompare(b.name); })
     });
   }
@@ -71,6 +71,11 @@ export class FavoritesPage implements OnInit, OnDestroy {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('toggle', control);
+    
+    if (control.state.value)
+      control.state.message="Off";
+    else
+      control.state.message="On";
   }
 
 

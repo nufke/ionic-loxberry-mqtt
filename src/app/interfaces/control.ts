@@ -1,8 +1,8 @@
 export interface Control {
-  id: string,
+  topic: string,
   name: string,
-  icon: {
-    name: string,
+  icon?: {
+    name?: string,
     href?: string,
     color?: string
   }
@@ -15,10 +15,10 @@ export interface Control {
   is_movable?: Boolean,
   priority?: number,
   state: {
-    value: string | Number,
+    value?: string | Number,
     format?: string,
     color?: string,
-    message?: string // TODO move outside interface
+    message?: string
   }
 }
   

@@ -65,7 +65,7 @@
                 </ng-container>
 
                 <ng-container *ngIf="control.type === 'switch'">
-                    <ion-toggle mode="ios" [(ngModel)]="_toggle_on" (click)="toggle($event, control)">
+                    <ion-toggle mode="ios" [(ngModel)]="control.state.value" (click)="toggle($event, control)">
                     </ion-toggle>
                 </ng-container>
 

@@ -16,12 +16,12 @@ export class RoomsPage implements OnInit, OnDestroy {
   constructor(public LoxBerryService: LoxBerry) {
     this.controls = [];
 
-    this.LoxBerryService.load().subscribe((controls: Control[]) => {
+    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
       this.controls = controls;
 
-      this.rooms = this.controls.map(item => item.room)
+      this.rooms = controls.map(item => item.room)
         .filter((value, index, self) => self.indexOf(value) === index)
-        .sort((a, b) => { return a.localeCompare(b); })
+        .sort((a, b) => { return a.localeCompare(b); });
     });
   }
 
@@ -33,6 +33,7 @@ export class RoomsPage implements OnInit, OnDestroy {
   }
 
   public filterControls(room: any) : Control[] {
+    //console.log('rooms filterControls!', this.controls, this.rooms, room);
     var filteredControls =  this.controls.filter( (resp) => { return resp.room == room });
     return filteredControls.sort( (a, b) => { return a.priority - b.priority });
   }
@@ -77,6 +78,11 @@ export class RoomsPage implements OnInit, OnDestroy {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('toggle', control);
+        
+    if (control.state.value)
+      control.state.message="Off";
+    else
+      control.state.message="On";
   }
 
 

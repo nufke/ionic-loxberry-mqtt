@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subscription } from 'rxjs';
+import { Subscription, BehaviorSubject, Observable } from 'rxjs';
 import { IMqttMessage, MqttService } from 'ngx-mqtt';
 
 import { util } from 'node-forge' // TODO check package
@@ -15,26 +15,56 @@ import { Control } from '../interfaces/control'
 export class LoxBerry {
 
   private subscription: Subscription[] = [];
-  private controls: Control[];
+  private controls: Control[] = [];
+
+  private _controls: BehaviorSubject<Control[]> = new BehaviorSubject([]);
+
+  public getControls() {
+    return this._controls.asObservable();
+  }
 
   constructor(private http: HttpClient,
               private _mqttService: MqttService) {
+    this.registerControlTopic();
   }
 
-  public load(): any {
-    if (this.controls) {
-      return of(this.controls);
-    } else {
-      return this.http
-        .get('assets/data/controls.json')
-        .pipe(map(this.registerControls, this));
+  public findTopic(val:string) {
+    for(var i = 0; i < this.controls.length; i++) { // loop through array index (1st level only)
+      if (this.controls[i].topic === val) return i;
     }
+    return -1; // topic not found
   }
 
-  private registerControls(controls: Control[]) {
-    this.controls = controls;
+  private addControl(obj: any, topic: string) {
+    var data = obj;
+    var idx = this.findTopic(topic);
+    console.log(idx);
+    if (idx >= 0) {
+      this.controls[idx] = obj; // Override full object in array
+      this.controls[idx].state.message = util.format(obj.state.format, obj.state.value);
+     }
+    else {
+      data.topic = topic;
+      data.state.message = util.format(obj.state.format, obj.state.value);
+      this.controls.push(data); // Add new object to array
+    }
+ 
+    this._controls.next(this.controls);
+  }
+
+  private registerControlTopic() {
+    this.subscription.push( this._mqttService.observe('loxberry/app/control/+/json')
+      .subscribe((message: IMqttMessage) => {
+        var topic_str = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
+        var obj = JSON.parse(message.payload.toString());
+        this.addControl(obj, topic_str);
+        console.log('subscribed to ', topic_str, obj);
+    }));
+    
+     /*
     // loop through all controls
-    this.controls.forEach( (control) => {
+
+     this.controls.forEach( (control) => {
       console.log(control.id);
       // TODO: refactor in more efficient function
       this.subscription.push( this._mqttService.observe(control.id).subscribe((message: IMqttMessage) => {
@@ -48,6 +78,7 @@ export class LoxBerry {
       this.subscription.push( this._mqttService.observe(control.id+'/name').subscribe((message: IMqttMessage) => {
         control.name = message.payload.toString();
       }));
+     
       this.subscription.push( this._mqttService.observe(control.id+'/icon/name').subscribe((message: IMqttMessage) => {
         control.icon.name = message.payload.toString();
       }));
@@ -96,7 +127,7 @@ export class LoxBerry {
       }));  
 
     }); //forEach
-
+*/
     return this.controls;
   }
 

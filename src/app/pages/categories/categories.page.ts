@@ -16,12 +16,12 @@ export class CategoriesPage implements OnInit, OnDestroy {
   constructor(public LoxBerryService: LoxBerry) {
     this.controls = [];
 
-    this.LoxBerryService.load().subscribe((controls: Control[]) => {
+    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
       this.controls = controls;
-
-      this.categories = this.controls.map(item => item.category)
-        .filter((value, index, self) => self.indexOf(value) === index)
-        .sort((a, b) => { return a.localeCompare(b); })
+    
+      this.categories = controls.map(item => item.category)
+        .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
+        .sort((a, b) => { return a.localeCompare(b); }) // sort A-Z
     });
   }
 
@@ -33,6 +33,7 @@ export class CategoriesPage implements OnInit, OnDestroy {
   }
 
   public filterControls(category: any) : Control[] {
+    //console.log('categories filterControls!', this.controls, this.categories, category);
     var filteredControls =  this.controls.filter( (resp) => { return resp.category == category });
     return filteredControls.sort( (a, b) => { return a.priority - b.priority });
   }
@@ -77,6 +78,11 @@ export class CategoriesPage implements OnInit, OnDestroy {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('toggle', control);
+
+    if (control.state.value)
+      control.state.message="Off";
+    else
+      control.state.message="On";
   }
 
 }
