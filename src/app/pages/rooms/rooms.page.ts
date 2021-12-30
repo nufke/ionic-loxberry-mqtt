@@ -35,7 +35,7 @@ export class RoomsPage implements OnInit, OnDestroy {
   public filterControls(room: any) : Control[] {
     //console.log('rooms filterControls!', this.controls, this.rooms, room);
     var filteredControls =  this.controls.filter( (resp) => { return resp.room == room });
-    return filteredControls.sort( (a, b) => { return a.priority - b.priority });
+    return filteredControls.sort( (a, b) => { return a.order - b.order });
   }
 
   pushed($event, control) {

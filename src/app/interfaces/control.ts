@@ -1,8 +1,8 @@
 export interface Control {
   topic: string,
   name: string,
-  icon?: {
-    name?: string,
+  icon: {
+    name: string,
     href?: string,
     color?: string
   }
@@ -12,11 +12,10 @@ export interface Control {
   is_favorite?: Boolean,
   is_visible?: Boolean,
   is_protected?: Boolean,
-  is_movable?: Boolean,
-  priority?: number,
+  order?: number,
   state: {
-    value?: string | Number,
-    format?: string,
+    value: string | Number,
+    format: string,
     color?: string,
     message?: string
   }

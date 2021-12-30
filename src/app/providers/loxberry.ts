@@ -18,7 +18,9 @@ export class LoxBerry {
   private controls: Control[] = [];
 
   private _controls: BehaviorSubject<Control[]> = new BehaviorSubject([]);
-
+  
+  private registered_topics: string[] = [];
+  
   public getControls() {
     return this._controls.asObservable();
   }
@@ -50,32 +52,36 @@ export class LoxBerry {
     this._controls.next(this.controls); // updates for Subscribers
   }
 
-  public registerControlTopics(obj, root_topic, root) {
-    for(var key in obj){ 
-       if (typeof obj[key] === "object") {
-         this.registerControlTopics(obj[key], root_topic, key+'/')
-       }
-       else {
-         if (key === 'topic' ) break;
-         var nested_topic = root_topic+'/'+root+key;
-         this.subscription.push( this._mqttService.observe(nested_topic)
-           .subscribe((message: IMqttMessage) => {
-             var idx = this.findTopic(root_topic);
-             // extract name of fields from MQTT topic name
-             var sub_topic = message.topic.replace(this.controls[idx].topic+'/', '').split('/');
-             if (sub_topic.length==2) {
-               //console.log("debug1: " , sub_topic, idx);
-               this.controls[idx][sub_topic[0]][sub_topic[1]] = message.payload.toString();
-             }
-             else { 
-               //console.log("debug2: " ,sub_topic, idx);
-               this.controls[idx][sub_topic[0]] = message.payload.toString();
-             }
-             this._controls.next(this.controls); // updates for Subscribers
-        }));
-        //console.log('registered to nested topic', nested_topic);
-      }
-    }
+  private registerControlTopics(root_topic) {
+    var sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color",
+    "/type", "/category", "/room", "/is_favorite", "/is_visible", "/is_protected", "/order",
+    "/state/value", "/state/format", "/state/color", "/state/message" ];
+
+    sub_topics.forEach( element => { 
+      var full_topic_name = root_topic+element;
+      if (this.registered_topics.includes(full_topic_name)) return;
+
+      this.registered_topics.push(full_topic_name);
+      this.subscription.push( this._mqttService.observe(full_topic_name)
+      .subscribe((message: IMqttMessage) => {
+        var idx = this.findTopic(root_topic);
+        // extract name of fields from MQTT topic name
+        var topic_received = message.topic.replace(this.controls[idx].topic+'/', '').split('/');
+        if (topic_received.length==2) {
+          //console.log("debug1: " , sub_topic, idx);
+          this.controls[idx][topic_received[0]][topic_received[1]] = message.payload.toString();
+        }
+        else { 
+          //console.log("debug2: " ,sub_topic, idx);
+          this.controls[idx][topic_received[0]] = message.payload.toString();
+        }
+        this._controls.next(this.controls); // updates for Subscribers
+      }));
+      //console.log('registered to nested topic', full_topic_name);
+      //console.log('registered topics', this.registered_topics); 
+    });
+    
+           
   }
 
   private registerControlRootTopic() {
@@ -85,11 +91,11 @@ export class LoxBerry {
         var obj = JSON.parse(message.payload.toString());
         this.addControl(obj, root_topic);
         //console.log('subscribed to root topic: ', root_topic);
-        this.registerControlTopics(obj, root_topic,'');
+        this.registerControlTopics(root_topic);
     }));
-    
     return this.controls;
   }
+
 
   public unload() : void {
     console.log('unsubscribe topics..');

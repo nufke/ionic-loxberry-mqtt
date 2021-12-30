@@ -35,7 +35,7 @@ export class CategoriesPage implements OnInit, OnDestroy {
   public filterControls(category: any) : Control[] {
     //console.log('categories filterControls!', this.controls, this.categories, category);
     var filteredControls =  this.controls.filter( (resp) => { return resp.category == category });
-    return filteredControls.sort( (a, b) => { return a.priority - b.priority });
+    return filteredControls.sort( (a, b) => { return a.order - b.order });
   }
 
   pushed($event, control) {
