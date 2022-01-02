@@ -4,7 +4,7 @@ import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
   {
-    path: 'tabs',
+    path: '',
     component: TabsPage,
     children: [
       {
@@ -20,15 +20,23 @@ const routes: Routes = [
         loadChildren: () => import('../categories/categories.module').then(m => m.CategoriesPageModule)
       },
       {
+        path: 'categories/control/:domain/:id',
+        loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule)
+      },
+      {
+        path: 'rooms/control/:domain/:id',
+        loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule)
+      },
+      {
         path: '',
-        redirectTo: '/tabs/favorites',
+        redirectTo: '/favorites',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/favorites',
+    redirectTo: '/favorites',
     pathMatch: 'full'
   }
 ];

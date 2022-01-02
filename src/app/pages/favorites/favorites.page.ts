@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoxBerry } from '../../providers/loxberry';
-import { Control } from '../../interfaces/control'
+import { Control } from '../../interfaces/datamodel'
 
 @Component({
   selector: 'app-favorites',

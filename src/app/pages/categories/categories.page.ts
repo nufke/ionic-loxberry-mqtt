@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoxBerry } from '../../providers/loxberry';
-import { Control } from '../../interfaces/control'
+import { Control, Category } from '../../interfaces/datamodel'
 
 @Component({
   selector: 'app-categories',
@@ -9,19 +9,22 @@ import { Control } from '../../interfaces/control'
 })
 export class CategoriesPage implements OnInit, OnDestroy {
 
-  public controls: Control[];
-
-  public categories: string[];
+  private filtered_categories: string[];
+  public categories: Category[] = [];
 
   constructor(public LoxBerryService: LoxBerry) {
-    this.controls = [];
-
-    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
-      this.controls = controls;
     
-      this.categories = controls.map(item => item.category)
+    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
+
+      this.filtered_categories = controls
+        .map(item => item.category )
         .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
-        .sort((a, b) => { return a.localeCompare(b); }) // sort A-Z
+    });
+
+    this.LoxBerryService.getCategories().subscribe((categories: Category[]) => {
+      this.categories = categories
+        .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); }) // sort A-Z
+        .filter( item => this.filtered_categories.indexOf(item.name) > -1);
     });
   }
 
@@ -30,59 +33,6 @@ export class CategoriesPage implements OnInit, OnDestroy {
 
   public ngOnDestroy() : void {
     this.LoxBerryService.unload();
-  }
-
-  public filterControls(category: any) : Control[] {
-    //console.log('categories filterControls!', this.controls, this.categories, category);
-    var filteredControls =  this.controls.filter( (resp) => { return resp.category == category });
-    return filteredControls.sort( (a, b) => { return a.order - b.order });
-  }
-
-  pushed($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed', control);
-  }
-
-  pushed_radio($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed radio', control);
-  }
-
-  pushed_up($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed up', control);
-  }
-  
-  pushed_down($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed down', control);
-  }
-
-  pushed_plus($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed plus', control);
-  }
-
-  pushed_minus($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed minus', control);
-  }
-
-  toggle($event, control){
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('toggle', control);
-
-    if (control.state.value)
-      control.state.message="Off";
-    else
-      control.state.message="On";
   }
 
 }

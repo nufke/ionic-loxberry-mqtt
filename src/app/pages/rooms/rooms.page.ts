@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoxBerry } from '../../providers/loxberry';
-import { Control } from '../../interfaces/control'
+import { Control, Room } from '../../interfaces/datamodel'
 
 @Component({
   selector: 'app-rooms',
@@ -9,20 +9,26 @@ import { Control } from '../../interfaces/control'
 })
 export class RoomsPage implements OnInit, OnDestroy {
 
-  public controls: Control[];
-
-  public rooms: string[];
+  private filtered_rooms: string[];
+  public rooms: Room[] = [];
 
   constructor(public LoxBerryService: LoxBerry) {
-    this.controls = [];
 
     this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
-      this.controls = controls;
 
-      this.rooms = controls.map(item => item.room)
-        .filter((value, index, self) => self.indexOf(value) === index)
-        .sort((a, b) => { return a.localeCompare(b); });
+      this.filtered_rooms = controls
+        .map(item => item.room )
+        .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
     });
+
+    this.LoxBerryService.getRooms().subscribe((rooms: Room[]) => {
+      this.rooms = rooms
+        .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); }) // sort A-Z
+        .filter( item => this.filtered_rooms.indexOf(item.name) > -1);
+    });
+    console.log(this.filtered_rooms);
+    console.log(this.rooms);
+    
   }
 
   public ngOnInit() : void {
@@ -31,59 +37,5 @@ export class RoomsPage implements OnInit, OnDestroy {
   public ngOnDestroy() : void {
     this.LoxBerryService.unload();
   }
-
-  public filterControls(room: any) : Control[] {
-    //console.log('rooms filterControls!', this.controls, this.rooms, room);
-    var filteredControls =  this.controls.filter( (resp) => { return resp.room == room });
-    return filteredControls.sort( (a, b) => { return a.order - b.order });
-  }
-
-  pushed($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed', control);
-  }
-
-  pushed_radio($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed radio', control);
-  }
-
-  pushed_up($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed up', control);
-  }
-  
-  pushed_down($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed down', control);
-  }
-
-  pushed_plus($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed plus', control);
-  }
-
-  pushed_minus($event, control) {
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('pushed minus', control);
-  }
-
-  toggle($event, control){
-    $event.preventDefault();
-    $event.stopPropagation();
-    console.log('toggle', control);
-        
-    if (control.state.value)
-      control.state.message="Off";
-    else
-      control.state.message="On";
-  }
-
 
 }

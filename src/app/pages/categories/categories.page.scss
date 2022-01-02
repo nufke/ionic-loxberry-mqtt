@@ -15,21 +15,6 @@ ion-item {
   --inner-padding-end: 3px;
 }
 
-ion-avatar {
-  background-color: var(--ion-avatar-bg-color, #d7d8da);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%; 
-
-  ion-icon {
-    margin: 0 auto; // center
-    font-size: 30px;
-    margin-top: 10px; // TODO vertial align
-    margin-left: 10px;
-    pointer-events: none;
-  }
-}
-
 ion-label {
   margin: 0 0 0 10px;
 
@@ -41,16 +26,4 @@ ion-label {
     font-size: 17px;
     line-height: 1.4;
   }
-}
-
-ion-toggle {
-  margin-right: 10px;
-}
-
-ion-fab-button {
-  --border-radius: 40px;
-  --background: var(--ion-avatar-bg-color, #d7d8da);
-  --box-shadow: 0px;
-  --background-activated:var(--ion-color-primary, #000000);
-  --background-activated-opacity: 100%;
 }

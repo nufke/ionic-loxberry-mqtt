@@ -1,7 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
     <ion-title>
-      Favorites
+      {{filter_item}}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,24 +12,26 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Favorites</ion-title>
+      <ion-title size="large">{{filter_item}}</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-grid>
+    <ng-container *ngFor="let label of items">
 
-      <ion-row>
+      <ion-row *ngIf="is_empty(controls, label)">
         <ion-label>
-          <p translate>Favorites</p>
+          <p translate>{{label.name}}</p>
         </ion-label>
       </ion-row>
 
       <ion-row>
-        <ion-col size="12" size-md="6" *ngFor="let control of favorites">
+        <ion-col size="12" size-md="6" *ngFor="let control of filter(controls, label)">
           <ion-card>
             <ion-card-content>
               <ion-item>
                 <ion-avatar>
+                  <!--<ion-icon name="{{control.icon.name}}"></ion-icon>-->
                   <span class="mdi {{control.icon.name}}"></span>
                 </ion-avatar>
                 <ion-label>
@@ -74,7 +79,7 @@
           </ion-card>
         </ion-col>
       </ion-row>
-
+    </ng-container>
   </ion-grid>
 
 </ion-content>
