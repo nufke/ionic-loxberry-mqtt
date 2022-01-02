@@ -23,15 +23,21 @@ export class ControlsPage implements OnInit, OnDestroy {
   private topic: string;
   private id: string;
 
-  public filter_item: string;
+  public itemName: string;
   public key: string;
-
+  
   constructor(public LoxBerryService: LoxBerry,
               private route: ActivatedRoute) {
 
     this.domain = this.route.snapshot.paramMap.get('domain');
     this.id = this.route.snapshot.paramMap.get('id');
     this.topic = this.domain+'/' + this.id;
+
+    if (this.domain === 'category')
+      this.key = 'room';
+
+    if (this.domain === 'room')
+      this.key = 'category';
 
     this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
       this.controls = controls;
@@ -43,63 +49,65 @@ export class ControlsPage implements OnInit, OnDestroy {
       this.filtered_rooms = controls
         .map(item => item.room )
         .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
-    });
 
-    //console.log('filtered_rooms:', this.filtered_rooms);
-    //console.log('filtered_categories:', this.filtered_categories);
+      this.updateControlMessage(controls);
+    });
     
     this.LoxBerryService.getCategories().subscribe((categories: Category[]) => {
       this.categories = categories
       .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); })
       .filter( item => this.filtered_categories.indexOf(item.name) > -1);
+      
+      if (this.domain === 'category')
+        this.itemName = this.findName(categories, this.topic);
+
+      if (this.domain === 'room')
+        this.items = categories;
     });
 
     this.LoxBerryService.getRooms().subscribe((rooms: Room[]) => {
       this.rooms = rooms
       .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); })
       .filter( item => this.filtered_rooms.indexOf(item.name) > -1);
+
+      if (this.domain === 'room')
+        this.itemName = this.findName(rooms, this.topic);
+
+      if (this.domain === 'category')
+        this.items = rooms;
     });
-    
-    if (this.domain === 'category') { 
-      this.items = this.rooms;
-      this.key = 'room';
-      this.filter_item = this.findName(this.categories, this.topic);
-    }
-
-    if (this.domain === 'room') {
-      this.items = this.categories;
-      this.key = 'category';
-      this.filter_item = this.findName(this.rooms, this.topic);
-    }
-
-    //console.log('categories:', this.categories);
-    //console.log('rooms:', this.rooms);
   }
 
   public ngOnInit() : void {
   }
 
   public ngOnDestroy() : void {
-    this.LoxBerryService.unload();
   }
 
   private findName(obj: any, topic:string) {
     for(var i = 0; i < obj.length; i++) {
       if (obj[i].topic === topic) return obj[i].name;
     }
-    return -1; // topic not found
+    return; // topic not found
   }
 
   public filter(item: any, label: any) : Control[] {
-    var filtered_items =  item.filter( resp => { return (resp[this.domain] == this.filter_item) && 
-                                                        (resp[this.key] == label.name ) });
+    var filtered_items =  item.filter( resp => { return (resp[this.domain] == this.itemName) && 
+      (resp[this.key] == label.name ) });
     return filtered_items.sort( (a, b) => { return a.order - b.order || a.name.localeCompare(b.name) });
-  }
+}
 
   public is_empty(item: any, label: any) : Boolean {
     return (this.filter(item, label).length > 0);
   }
 
+  private updateControlMessage(control: any)
+  {
+    control.forEach( item => {
+      if (item.type == 'switch')
+        item.state.message = item.state.value ? "On" : "Off";
+    });
+  }
 
   pushed($event, control) {
     $event.preventDefault();

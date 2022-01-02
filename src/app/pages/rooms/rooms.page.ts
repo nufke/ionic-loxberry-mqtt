@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { IonContent } from '@ionic/angular';
 import { LoxBerry } from '../../providers/loxberry';
 import { Control, Room } from '../../interfaces/datamodel'
 
@@ -8,6 +9,8 @@ import { Control, Room } from '../../interfaces/datamodel'
   styleUrls: ['rooms.page.scss']
 })
 export class RoomsPage implements OnInit, OnDestroy {
+
+  @ViewChild(IonContent, { static: false }) content: IonContent;
 
   private filtered_rooms: string[];
   public rooms: Room[] = [];
@@ -26,9 +29,6 @@ export class RoomsPage implements OnInit, OnDestroy {
         .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); }) // sort A-Z
         .filter( item => this.filtered_rooms.indexOf(item.name) > -1);
     });
-    console.log(this.filtered_rooms);
-    console.log(this.rooms);
-    
   }
 
   public ngOnInit() : void {
@@ -38,4 +38,7 @@ export class RoomsPage implements OnInit, OnDestroy {
     this.LoxBerryService.unload();
   }
 
+  public ionViewWillEnter() : void {
+    this.content.scrollToTop();
+  }
 }

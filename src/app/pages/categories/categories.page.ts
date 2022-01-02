@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild  } from '@angular/core';
+import { IonContent } from '@ionic/angular';
 import { LoxBerry } from '../../providers/loxberry';
 import { Control, Category } from '../../interfaces/datamodel'
 
@@ -8,6 +9,8 @@ import { Control, Category } from '../../interfaces/datamodel'
   styleUrls: ['categories.page.scss']
 })
 export class CategoriesPage implements OnInit, OnDestroy {
+
+  @ViewChild(IonContent, { static: false }) content: IonContent;
 
   private filtered_categories: string[];
   public categories: Category[] = [];
@@ -35,4 +38,7 @@ export class CategoriesPage implements OnInit, OnDestroy {
     this.LoxBerryService.unload();
   }
 
+  public ionViewWillEnter() : void {
+    this.content.scrollToTop();
+  }
 }

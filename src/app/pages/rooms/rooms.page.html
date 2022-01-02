@@ -14,33 +14,23 @@
   </ion-header>
 
   <ion-grid>
-
-      <ion-row>
-        <ion-label>
-          <p translate>{{room}}</p>
-        </ion-label>
-      </ion-row>
-
-      <ion-row>
-        <ion-col size="6" size-md="3" *ngFor="let room of rooms">
-          <ion-card routerLink="control/{{room.topic}}">
-            <img src="/assets/images/{{room.image}}" />
-            <ion-card-content>
-              <ion-item>
-                <!--
-                <ion-avatar>
-                  <ion-icon name="{{control.icon.name}}"></ion-icon>
-                </ion-avatar>-->
-                <ion-label>
-                  <h1>{{room.name}}</h1>
-                </ion-label>
-
-              </ion-item>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-
+    <ion-row>
+      <ion-col size="6" size-md="3" *ngFor="let room of rooms">
+        <ion-card routerLink="control/{{room.topic}}">
+          <!--<img src="/assets/images/{{room.image}}" />-->
+          <ion-card-content>
+            <ion-item class="ion-text-center">
+              <ion-icon src="{{room.icon.name}}"></ion-icon>
+            </ion-item>
+            <ion-item>
+              <ion-label class="ion-text-center">
+                <h1>{{room.name}}</h1>
+              </ion-label>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
   </ion-grid>
 
 </ion-content>

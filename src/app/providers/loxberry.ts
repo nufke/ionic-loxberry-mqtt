@@ -34,7 +34,6 @@ export class LoxBerry {
     return this._rooms.asObservable();
   }
 
-
   constructor(private http: HttpClient,
               private _mqttService: MqttService) {
     this.registerTopic('loxberry/app/settings/json');
@@ -47,23 +46,65 @@ export class LoxBerry {
     return -1; // topic not found
   }
 
-  private registerTopic( topic: string) {
+  private registerTopic(topic: string) {
     this.subscription.push( this._mqttService.observe(topic)
       .subscribe((message: IMqttMessage) => {
         var mqtt_topic = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
-        var obj = JSON.parse(message.payload.toString());
-        //console.log('received from root topic: ', mqtt_topic, obj);
-        this.ProcessJSON(obj);
+        var msg = message.payload.toString();
+        if (msg.length == 0 )
+          this.flushData();
+        else
+          this.ProcessJSON(JSON.parse(msg));
     }));
   }
 
-  //TODO: more intelligent loading of JSON
+  private flushData() {
+    this.controls = [];
+    this.categories = [];
+    this.rooms = [];
+
+    this._controls.next(this.controls); 
+    this._categories.next(this.categories); 
+    this._rooms.next(this.rooms); 
+  }
+
+  // TODO: only items will be added, not removed. 
+  // To remove items, flush the entire dataset first, and add the required items 
   private ProcessJSON(obj: any) {
     if (!obj) return;
-       
-    this.controls = obj.controls;
-    this.categories = obj.categories;
-    this.rooms = obj.rooms;
+
+    obj.controls.forEach( item => {
+      var idx = this.findTopic(obj.controls, item.topic);
+      if (idx >= 0) { // Item exists
+        this.controls[idx] = item; // Override full object in array
+        this.controls[idx].state.message = util.format(item.state.format, item.state.value);
+       }
+      else { // New item
+        var control = item;
+        control.state.message = util.format(item.state.format, item.state.value);
+        this.controls.push(control); // Add new object to array
+      }
+    });
+
+    obj.categories.forEach( item => {
+      var idx = this.findTopic(obj.categories, item.topic);
+      if (idx >= 0) { // Item exists
+        this.categories[idx] = item; // Override full object in array
+       }
+      else { // New item
+        this.categories.push(item); // Add new object to array
+      }
+    });
+
+    obj.rooms.forEach( item => {
+      var idx = this.findTopic(obj.rooms, item.topic);
+      if (idx >= 0) { // Item exists
+        this.rooms[idx] = item; // Override full object in array
+       }
+      else { // New item
+        this.rooms.push(item); // Add new object to array
+      }
+    });
 
     this._controls.next(this.controls); 
     this._categories.next(this.categories); 
@@ -72,7 +113,7 @@ export class LoxBerry {
     var control_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color",
        "/type", "/category", "/room", "/is_favorite", "/is_visible", "/is_protected", "/order",
        "/state/value", "/state/format", "/state/color", "/state/message" ];
-    var cat_room_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color",
+    var cat_room_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color", "/image",
       "/is_visible", "/is_protected", "/order" ];
 
     var root_topic = 'loxberry/app';
@@ -81,6 +122,7 @@ export class LoxBerry {
     this.registerSubTopics(this.rooms, this._rooms, root_topic, 'room', cat_room_sub_topics);
   }
 
+  
   private registerSubTopics(data: any, subject: any, root_topic: string, domain_topic: string, sub_topics: string[]) {
 
     sub_topics.forEach( element => { 

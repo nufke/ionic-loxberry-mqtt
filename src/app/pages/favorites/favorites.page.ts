@@ -20,7 +20,9 @@ export class FavoritesPage implements OnInit, OnDestroy {
       this.controls = controls;
 
       this.favorites = controls.filter(item => item.is_favorite)
-        .sort((a, b) => { return a.name.localeCompare(b.name); })
+        .sort((a, b) => { return a.name.localeCompare(b.name); });
+
+      this.updateControlMessage(controls);
     });
   }
 
@@ -30,6 +32,15 @@ export class FavoritesPage implements OnInit, OnDestroy {
   public ngOnDestroy() : void {
     this.LoxBerryService.unload();
   }
+
+  private updateControlMessage(control: any)
+  {
+    control.forEach( item => {
+      if (item.type == 'switch')
+        item.state.message = item.state.value ? "On" : "Off";
+    });
+  }
+
 
   pushed($event, control) {
     $event.preventDefault();

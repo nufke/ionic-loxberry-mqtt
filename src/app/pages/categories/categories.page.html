@@ -17,24 +17,19 @@
       <ion-row>
         <ion-col size="6" size-md="3" *ngFor="let category of categories">
           <ion-card routerLink="control/{{category.topic}}">
-            <img src="/assets/images/{{category.image}}" />
             <ion-card-content>
-              <ion-item>
-                <!--
-                <ion-avatar>
-                  <ion-icon name="{{control.icon.name}}"></ion-icon>
-                </ion-avatar>-->
-                
+              <ion-item class="ion-text-center">
+                <ion-icon src="{{category.icon.name}}"></ion-icon>
+              </ion-item>
+              <ion-item class="ion-text-center">
                 <ion-label>
                   <h1>{{category.name}}</h1>
                 </ion-label>
-
               </ion-item>
             </ion-card-content>
           </ion-card>
         </ion-col>
       </ion-row>
-
   </ion-grid>
 
 </ion-content>
