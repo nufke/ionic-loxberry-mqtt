@@ -13,14 +13,12 @@ ion-item {
   --padding-start: 10px;
   --padding-end: 3px;
   --inner-padding-end: 3px;
+  margin: 10px 0 10px 0;
 }
 
-.mdi {
+ion-icon {
   margin: 0 auto; // center
-  font-size: 34px;
-  margin-top: 10px; // TODO vertial align
-  margin-left: 8px;
-  pointer-events: none;
+  padding: 0;
 }
 
 ion-label {

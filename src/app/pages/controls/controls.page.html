@@ -27,13 +27,11 @@
      
       <ion-row>
         <ion-col size="12" size-md="6" *ngFor="let control of filter(controls, label)">
-          <ion-card>
+          <ion-card mode="ios">
             <ion-card-content>
               <ion-item>
-                <ion-avatar>
-                  <!--<ion-icon name="{{control.icon.name}}"></ion-icon>-->
-                  <span class="mdi {{control.icon.name}}"></span>
-                </ion-avatar>
+                <!--<ion-icon src="{{control.icon.name}}"></ion-icon>-->
+                <ion-icon name="{{control.icon.name}}"></ion-icon>
                 <ion-label>
                   <h1>{{control.name}}</h1>
                   <h2>{{control.state.message}}</h2>
@@ -70,7 +68,7 @@
                 </ng-container>
 
                 <ng-container *ngIf="control.type === 'switch'">
-                    <ion-toggle mode="ios" [(ngModel)]="control.state.value" (click)="toggle($event, control)">
+                    <ion-toggle mode="ios" [(ngModel)]="control.state._toggle" (click)="toggle($event, control)">
                     </ion-toggle>
                 </ng-container>
 

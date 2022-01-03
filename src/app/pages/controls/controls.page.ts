@@ -50,7 +50,7 @@ export class ControlsPage implements OnInit, OnDestroy {
         .map(item => item.room )
         .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
 
-      this.updateControlMessage(controls);
+      this.updateControlState(controls);
     });
     
     this.LoxBerryService.getCategories().subscribe((categories: Category[]) => {
@@ -101,11 +101,12 @@ export class ControlsPage implements OnInit, OnDestroy {
     return (this.filter(item, label).length > 0);
   }
 
-  private updateControlMessage(control: any)
+  private updateControlState(control: any)
   {
     control.forEach( item => {
       if (item.type == 'switch')
-        item.state.message = item.state.value ? "On" : "Off";
+        item.state._toggle = (item.state.value == 1);
+        item.state.message = item.state._toggle ? "On" : "Off";
     });
   }
 
@@ -145,15 +146,19 @@ export class ControlsPage implements OnInit, OnDestroy {
     console.log('pushed minus', control);
   }
 
-  toggle($event, control){
+  toggle($event, control) {
     $event.preventDefault();
     $event.stopPropagation();
-    console.log('toggle', control);
 
-    if (control.state.value)
-      control.state.message="Off";
-    else
-      control.state.message="On";
+    if (control.state._toggle) {
+      control.state.message = "Off";
+      control.state.value = "0";
+    }
+    else {
+      control.state.message = "On";
+      control.state.value = "1";
+    }
+    this.LoxBerryService.sendMessage(control);
   }
 
 }

@@ -22,6 +22,9 @@ export class LoxBerry {
   
   private registered_topics: string[] = [];
   
+  // TODO move to app configuration
+  private registered_topic_prefix = 'loxberry/app';
+
   public getControls() {
     return this._controls.asObservable();
   }
@@ -36,7 +39,7 @@ export class LoxBerry {
 
   constructor(private http: HttpClient,
               private _mqttService: MqttService) {
-    this.registerTopic('loxberry/app/settings/json');
+    this.registerTopic(this.registered_topic_prefix+'/settings/json');
   }
 
   private findTopic(data: any, val:string) {
@@ -116,17 +119,16 @@ export class LoxBerry {
     var cat_room_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color", "/image",
       "/is_visible", "/is_protected", "/order" ];
 
-    var root_topic = 'loxberry/app';
-    this.registerSubTopics(this.controls, this._controls, root_topic, 'control', control_sub_topics);
-    this.registerSubTopics(this.categories, this._categories, root_topic, 'category', cat_room_sub_topics);
-    this.registerSubTopics(this.rooms, this._rooms, root_topic, 'room', cat_room_sub_topics);
+    this.registerSubTopics(this.controls, this._controls, 'control', control_sub_topics);
+    this.registerSubTopics(this.categories, this._categories, 'category', cat_room_sub_topics);
+    this.registerSubTopics(this.rooms, this._rooms, 'room', cat_room_sub_topics);
   }
 
   
-  private registerSubTopics(data: any, subject: any, root_topic: string, domain_topic: string, sub_topics: string[]) {
-
+  private registerSubTopics(data: any, subject: any, domain_topic: string, sub_topics: string[]) {
+    console.log('register...');
     sub_topics.forEach( element => { 
-      var full_topic_name = root_topic+'/'+domain_topic+'/+'+element; // note: whildcard included
+      var full_topic_name = this.registered_topic_prefix+'/'+domain_topic+'/+'+element; // note: whildcard included
       if (this.registered_topics.includes(full_topic_name)) {
         console.log("topic already exists and ignored:",full_topic_name );
         return;
@@ -134,15 +136,18 @@ export class LoxBerry {
       this.registered_topics.push(full_topic_name);
       this.subscription.push( this._mqttService.observe(full_topic_name)
       .subscribe((message: IMqttMessage) => {
-        var topic_received = message.topic.replace(root_topic+'/'+domain_topic+'/', '').split('/');
+        var topic_received = message.topic.replace(this.registered_topic_prefix+'/'+domain_topic+'/', '').split('/');
         var idx = this.findTopic(data, domain_topic+'/'+topic_received[0]);
-        console.log(root_topic+'/'+topic_received[0], idx);
+        var msg = message.payload.toString();
+
         // extract name of fields from MQTT topic name
         if (topic_received.length == 3) {
-          data[idx][topic_received[1]][topic_received[2]] = message.payload.toString();
+          data[idx][topic_received[1]][topic_received[2]] = msg;
+          console.log('received: ',this.registered_topic_prefix+'/'+domain_topic+'/'+topic_received[0]+'/'+topic_received[1]+'/'+topic_received[2], msg);
         }
         else { 
-          data[idx][topic_received[1]] = message.payload.toString();
+          data[idx][topic_received[1]] = msg;
+          console.log('received: ',this.registered_topic_prefix+'/'+domain_topic+'/'+topic_received[0]+'/'+topic_received[1], msg);
         }
         subject.next(data); // updates for Subscribers
       }));
@@ -153,6 +158,19 @@ export class LoxBerry {
   public unload() : void {
     console.log('unsubscribe topics..');
     this.subscription.forEach( (item) => { item.unsubscribe(); } );
+  }
+
+  public sendMessage(obj: any) {
+    var idx = this.findTopic(this.controls, obj.topic);
+    var topic_root = this.registered_topic_prefix+'/'+obj.topic;
+
+    if (idx==-1) {
+      console.log('Topic '+obj.topic+' not found. Nothing published.');
+      return;
+    }
+    
+    this._mqttService.unsafePublish(topic_root+'/state/value', obj.state.value, { qos: 1, retain: false });
+    console.log('MQTT publish:', topic_root+'/state/value', obj.state.value);
   }
 
 }

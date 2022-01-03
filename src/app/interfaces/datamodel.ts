@@ -17,8 +17,9 @@ export interface Control {
     value: string | Number,
     format: string,
     color?: string,
-    message?: string
-  }
+    message?: string,
+    _toggle: Boolean // INTERNAL USE ONLY
+  },
 }
 
 export interface Category {

@@ -16,10 +16,11 @@
   <ion-grid>
       <ion-row>
         <ion-col size="6" size-md="3" *ngFor="let category of categories">
-          <ion-card routerLink="control/{{category.topic}}">
+          <ion-card mode="ios" routerLink="control/{{category.topic}}">
             <ion-card-content>
               <ion-item class="ion-text-center">
-                <ion-icon src="{{category.icon.name}}"></ion-icon>
+                <!--<ion-icon src="{{category.icon.name}}"></ion-icon>-->
+                <ion-icon name="{{category.icon.name}}"></ion-icon>
               </ion-item>
               <ion-item class="ion-text-center">
                 <ion-label>
