@@ -39,7 +39,7 @@ export class LoxBerry {
 
   constructor(private http: HttpClient,
               private _mqttService: MqttService) {
-    this.registerTopic(this.registered_topic_prefix+'/settings/json');
+    this.registerTopic(this.registered_topic_prefix+'/settings/set');
   }
 
   private findTopic(data: any, val:string) {
