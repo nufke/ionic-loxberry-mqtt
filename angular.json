@@ -32,7 +32,17 @@
               },
               {
                 "glob": "**/*.svg",
-                "input": "src/assets/icon/line-awesome-1.3.0/svg",
+                "input": "node_modules/line-awesome/svg",
+                "output": "./svg"
+              },
+              {
+                "glob": "**/*.svg",
+                "input": "node_modules/bootstrap-icons/icons/svg",
+                "output": "./svg"
+              },
+              {
+                "glob": "**/*.svg",
+                "input": "src/assets/icon",
                 "output": "./svg"
               }
             ],
