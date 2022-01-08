@@ -38,9 +38,16 @@ ion-toggle {
 }
 
 ion-fab-button {
+  margin-left: 2px;
+  margin-top: 0px;
+  margin-bottom: 0px;
   --border-radius: 40px;
   --background: var(--ion-avatar-bg-color, #d7d8da);
   --box-shadow: 0px;
-  --background-activated:var(--ion-color-primary, #000000);
+  --background-activated: var(--ion-color-primary, #000000);
   --background-activated-opacity: 100%;
+}
+
+.ion-activated {
+  --transform: scale(1.0); // disable animation of dab button
 }

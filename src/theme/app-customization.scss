@@ -1,0 +1,16 @@
+/*
+ * Global app-specific customization of shadow DOM elements
+*/
+
+:root,
+:root[mode='ios'],
+:root[mode='md'] {
+
+  // background background for white theme
+  //--ion-background-color: #efefef; // general background
+  //--ion-item-background: #efefef; // e.g. for cards
+
+  --ion-toolbar-background: none;
+  //--ion-text-color: #fafafa;
+  //--inner-padding-end: 0px;
+}
