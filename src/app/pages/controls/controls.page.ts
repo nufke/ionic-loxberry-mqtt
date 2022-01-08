@@ -121,6 +121,8 @@ export class ControlsPage implements OnInit, OnDestroy {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed', control);
+    control.state.value = "pushed";
+    this.LoxBerryService.sendMessage(control);
   }
 
   pushed_radio($event, control) {
@@ -170,7 +172,6 @@ export class ControlsPage implements OnInit, OnDestroy {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed minus', control);
-
     control.state.value = "minus";
     this.LoxBerryService.sendMessage(control);
   }
@@ -180,11 +181,9 @@ export class ControlsPage implements OnInit, OnDestroy {
     $event.stopPropagation();
 
     if (control.state._toggle) {
-      control.state._message = "Off";
       control.state.value = "0";
     }
     else {
-      control.state._message = "On";
       control.state.value = "1";
     }
     this.LoxBerryService.sendMessage(control);
