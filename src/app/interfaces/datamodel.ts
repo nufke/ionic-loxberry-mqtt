@@ -14,12 +14,13 @@ export interface Control {
   is_protected?: Boolean,
   order?: number,
   state: {
-    value: string | Number,
-    format: string,
+    value: string,
+    format?: string,
     color?: string,
-    message?: string,
-    _toggle: Boolean // INTERNAL USE ONLY
-  },
+    states?: string[],
+    _message?: string, // INTERNAL USE ONLY, NOT PART OF API
+    _toggle?: Boolean // INTERNAL USE ONLY, NOT PART OF API
+  }
 }
 
 export interface Category {

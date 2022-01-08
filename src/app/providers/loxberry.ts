@@ -43,7 +43,7 @@ export class LoxBerry {
   }
 
   private findTopic(data: any, val:string) {
-    for(var i = 0; i < data.length; i++) { // loop through array index (1st level only)
+    for(let i = 0; i < data.length; i++) { // loop through array index (1st level only)
       if (data[i].topic === val) return i;
     }
     return -1; // topic not found
@@ -52,8 +52,8 @@ export class LoxBerry {
   private registerTopic(topic: string) {
     this.subscription.push( this._mqttService.observe(topic)
       .subscribe((message: IMqttMessage) => {
-        var mqtt_topic = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
-        var msg = message.payload.toString();
+        let mqtt_topic = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
+        let msg = message.payload.toString();
         if (msg.length == 0 )
           this.flushData();
         else
@@ -77,20 +77,20 @@ export class LoxBerry {
     if (!obj) return;
 
     obj.controls.forEach( item => {
-      var idx = this.findTopic(obj.controls, item.topic);
+      let idx = this.findTopic(obj.controls, item.topic);
       if (idx >= 0) { // Item exists
         this.controls[idx] = item; // Override full object in array
-        this.controls[idx].state.message = util.format(item.state.format, item.state.value);
+        this.controls[idx].state._message = util.format(item.state.format, item.state.value);
        }
       else { // New item
-        var control = item;
-        control.state.message = util.format(item.state.format, item.state.value);
+        let control = item;
+        control.state._message = util.format(item.state.format, item.state.value);
         this.controls.push(control); // Add new object to array
       }
     });
 
     obj.categories.forEach( item => {
-      var idx = this.findTopic(obj.categories, item.topic);
+      let idx = this.findTopic(obj.categories, item.topic);
       if (idx >= 0) { // Item exists
         this.categories[idx] = item; // Override full object in array
        }
@@ -100,7 +100,7 @@ export class LoxBerry {
     });
 
     obj.rooms.forEach( item => {
-      var idx = this.findTopic(obj.rooms, item.topic);
+      let idx = this.findTopic(obj.rooms, item.topic);
       if (idx >= 0) { // Item exists
         this.rooms[idx] = item; // Override full object in array
        }
@@ -113,10 +113,10 @@ export class LoxBerry {
     this._categories.next(this.categories); 
     this._rooms.next(this.rooms); 
 
-    var control_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color",
+    let control_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color",
        "/type", "/category", "/room", "/is_favorite", "/is_visible", "/is_protected", "/order",
-       "/state/value", "/state/format", "/state/color", "/state/message" ];
-    var cat_room_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color", "/image",
+       "/state/value", "/state/format", "/state/color" ];
+    let cat_room_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color", "/image",
       "/is_visible", "/is_protected", "/order" ];
 
     this.registerSubTopics(this.controls, this._controls, 'control', control_sub_topics);
@@ -126,9 +126,8 @@ export class LoxBerry {
 
   
   private registerSubTopics(data: any, subject: any, domain_topic: string, sub_topics: string[]) {
-    console.log('register...');
     sub_topics.forEach( element => { 
-      var full_topic_name = this.registered_topic_prefix+'/'+domain_topic+'/+'+element; // note: whildcard included
+      let full_topic_name = this.registered_topic_prefix+'/'+domain_topic+'/+'+element; // note: whildcard included
       if (this.registered_topics.includes(full_topic_name)) {
         console.log("topic already exists and ignored:",full_topic_name );
         return;
@@ -136,9 +135,9 @@ export class LoxBerry {
       this.registered_topics.push(full_topic_name);
       this.subscription.push( this._mqttService.observe(full_topic_name)
       .subscribe((message: IMqttMessage) => {
-        var topic_received = message.topic.replace(this.registered_topic_prefix+'/'+domain_topic+'/', '').split('/');
-        var idx = this.findTopic(data, domain_topic+'/'+topic_received[0]);
-        var msg = message.payload.toString();
+        let topic_received = message.topic.replace(this.registered_topic_prefix+'/'+domain_topic+'/', '').split('/');
+        let idx = this.findTopic(data, domain_topic+'/'+topic_received[0]);
+        let msg = message.payload.toString();
 
         // extract name of fields from MQTT topic name
         if (topic_received.length == 3) {
@@ -161,8 +160,8 @@ export class LoxBerry {
   }
 
   public sendMessage(obj: any) {
-    var idx = this.findTopic(this.controls, obj.topic);
-    var topic_root = this.registered_topic_prefix+'/'+obj.topic;
+    let idx = this.findTopic(this.controls, obj.topic);
+    let topic_root = this.registered_topic_prefix+'/'+obj.topic;
 
     if (idx==-1) {
       console.log('Topic '+obj.topic+' not found. Nothing published.');

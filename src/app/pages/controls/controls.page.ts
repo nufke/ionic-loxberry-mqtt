@@ -85,14 +85,14 @@ export class ControlsPage implements OnInit, OnDestroy {
   }
 
   private findName(obj: any, topic:string) {
-    for(var i = 0; i < obj.length; i++) {
+    for(let i = 0; i < obj.length; i++) {
       if (obj[i].topic === topic) return obj[i].name;
     }
     return; // topic not found
   }
 
   public filter(item: any, label: any) : Control[] {
-    var filtered_items =  item.filter( resp => { return (resp[this.domain] == this.itemName) && 
+    let filtered_items =  item.filter( resp => { return (resp[this.domain] == this.itemName) && 
       (resp[this.key] == label.name ) });
     return filtered_items.sort( (a, b) => { return a.order - b.order || a.name.localeCompare(b.name) });
 }
@@ -104,9 +104,16 @@ export class ControlsPage implements OnInit, OnDestroy {
   private updateControlState(control: any)
   {
     control.forEach( item => {
-      if (item.type == 'switch')
-        item.state._toggle = (item.state.value == 1);
-        item.state.message = item.state._toggle ? "On" : "Off";
+      if (item.type === 'switch') {
+        item.state._toggle = (item.state.value == '1');
+        item.state._message = item.state._toggle ? "On" : "Off";
+      }
+      if (item.type === 'radio') {
+        if (item.state.states) {
+          let val = parseInt(item.state.value);
+          item.state._message = item.state.states[val];
+        }
+      }
     });
   }
 
@@ -120,30 +127,52 @@ export class ControlsPage implements OnInit, OnDestroy {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed radio', control);
+    
+    if (control.state.states) // process only if there are radio states
+    {
+      let val = parseInt(control.state.value);
+      console.log(val);
+      if (val == (control.state.states.length-1))
+        val = 0;
+      else
+        val++;
+    
+      control.state.value = String(val);
+      this.LoxBerryService.sendMessage(control);
+    }
   }
 
   pushed_up($event, control) {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed up', control);
+    control.state.value = "up";
+    this.LoxBerryService.sendMessage(control);
   }
   
   pushed_down($event, control) {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed down', control);
+    control.state.value = "down";
+    this.LoxBerryService.sendMessage(control);
   }
 
   pushed_plus($event, control) {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed plus', control);
+    control.state.value = "plus";
+    this.LoxBerryService.sendMessage(control);
   }
 
   pushed_minus($event, control) {
     $event.preventDefault();
     $event.stopPropagation();
     console.log('pushed minus', control);
+
+    control.state.value = "minus";
+    this.LoxBerryService.sendMessage(control);
   }
 
   toggle($event, control) {
@@ -151,11 +180,11 @@ export class ControlsPage implements OnInit, OnDestroy {
     $event.stopPropagation();
 
     if (control.state._toggle) {
-      control.state.message = "Off";
+      control.state._message = "Off";
       control.state.value = "0";
     }
     else {
-      control.state.message = "On";
+      control.state._message = "On";
       control.state.value = "1";
     }
     this.LoxBerryService.sendMessage(control);
