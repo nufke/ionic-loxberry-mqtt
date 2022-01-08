@@ -1,6 +1,8 @@
 # ionic-loxberry-mqtt
 
-Early development of a LoxBerry MQTT App
+Early development of a LoxBerry MQTT App.
+
+**NOTE**: The App will not interact with MQTT devices directly. The MQTT API defined for this App enables the control of the App-specific elements using MQTT. To program hardware devices using this app, you need to run an MQTT-to-MQTT topic translator at a central location (e.g. Raspberry Pi).
 
 # screenshots
 
