@@ -13,13 +13,6 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   connectOnCreate: false
 }
-/*
-  hostname: '192.168.1.200',        // replace by MQTT broker IP address
-  username : 'loxberry', // replace by MQTT broker username
-  password : '5T9ZYSSvZWs03QMh', // replace by MQTT broker password
-  port: 9001,            // Mosquitto WebSocket port
-  path: ''
-  */
 
 @NgModule({
   declarations: [

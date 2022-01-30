@@ -7,20 +7,21 @@ import { ApiService } from '../../services/api.service';
   styleUrls: ['./inside.page.scss'],
 })
 export class InsidePage implements OnInit {
-  secretData = null;
+  data = null;
 
   constructor(private apiService: ApiService) { }
 
   ngOnInit() { }
 
   async getData() {
-    this.secretData = null;
-/*
-    this.apiService.getMqttSettings().subscribe((res: any) => {
-      this.secretData = res;
-      console.log('secretData', this.secretData);
+    this.data = null;
+
+    this.apiService.getInfo().then((res: any) => {
+      if (res) {
+        this.data = res.message;
+        console.log('data', this.data);
+      }
     });
-*/
   }
 
   logout() {

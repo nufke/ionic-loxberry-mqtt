@@ -47,6 +47,20 @@ export class ApiService {
     }
   }
 
+  getInfo() {
+    if (this.accessToken) {
+      console.log("getinfo accessToken:", this.accessToken);
+      console.log("getinfo refreshToken:", this.refreshToken);
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          'x-access-token': this.accessToken
+        })
+      }
+      return this.http.get(this.loxberryUrl+'/owner', httpOptions).toPromise();
+    }
+  }
+
   // Get protected MQTT settings
   getMqttSettings() {
     if (this.accessToken) {
@@ -72,13 +86,11 @@ export class ApiService {
 
   // Sign in a user and store access and refres token
   login(credentials: { ipaddress, username, password }): Observable<any> {
-    this.storageService.setLoxBerryIP(credentials.ipaddress);
+    this.storageService.store({loxberryIP: credentials.ipaddress});
     return this.http.post(this.loxberryUrl +'/auth/login', credentials).pipe(
       switchMap((tokens: { accessToken, refreshToken }) => {
         this.currentAccessToken = tokens.accessToken;
-        const storeAccess = this.storageService.setAccessToken(tokens.accessToken);
-        const storeRefresh = this.storageService.setRefreshToken(tokens.refreshToken);
-        return from(Promise.all([storeAccess, storeRefresh]));
+        return from(this.storageService.store({accessToken: tokens.accessToken, refreshToken: tokens.refreshToken}));
       }),
       tap(_ => {
         this.isAuthenticated.next(true);
@@ -90,18 +102,13 @@ export class ApiService {
   // Remove all local tokens at the client side
   // and remove refreshToken at server side
   logout() {
-    console.log("logout token:", this.refreshToken);
     if (this.refreshToken) // only initiate logout if we have a refreshToken
-    {
-      this.http.post(this.loxberryUrl+'/auth/logout', { 'refreshToken': this.refreshToken }).subscribe(_ => {
-        this.currentAccessToken = null;
-        // Remove all stored tokens
-        this.storageService.clearAccessToken();
-        this.storageService.clearRefreshToken();
-        this.isAuthenticated.next(false);
-        this.router.navigateByUrl('/', { replaceUrl: true });
-      });
-    }
+      this.http.post(this.loxberryUrl+'/auth/logout', { 'refreshToken': this.refreshToken });
+    this.currentAccessToken = null;
+    // Remove all stored tokens
+    this.storageService.store({accessToken: null, refreshToken: null});
+    this.isAuthenticated.next(false);
+    this.router.navigateByUrl('/', { replaceUrl: true });
   }
 
   // Load the refresh token from storage
@@ -117,8 +124,8 @@ export class ApiService {
   }
 
   // Store a new access token
-  storeAccessToken(accessToken) {
-    this.currentAccessToken = accessToken;
-    return from(this.storageService.setAccessToken(accessToken));
+  storeAccessToken(token) {
+    this.currentAccessToken = token;
+    return from(this.storageService.store({accessToken: token}));
   }
 }

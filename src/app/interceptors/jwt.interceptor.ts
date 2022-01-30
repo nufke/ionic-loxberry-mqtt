@@ -109,7 +109,7 @@ export class JwtInterceptor implements HttpInterceptor {
       // First, get a new access token
       return this.apiService.getNewAccessToken().pipe(
         switchMap((token: any) => {
-          console.log('token:', token);
+          console.log('getNewAccessToken:', token);
           if (token) {
             // Store the new token
             const accessToken = token.accessToken;
