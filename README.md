@@ -2,9 +2,17 @@
 
 Early development of a LoxBerry MQTT App.
 
-**NOTE**: The App will not interact with MQTT devices directly. The MQTT API defined for this App enables the control of the App-specific elements using MQTT. To program hardware devices using this app, you need to run an MQTT-to-MQTT topic translator at a central location (e.g. Raspberry Pi).
+**NOTE**: The App will not interact with MQTT devices directly. The MQTT API defined for this App enables the control of the App-specific elements using MQTT. To program hardware devices using this app, you need to run an MQTT-to-MQTT topic translator or a program such as Node-RED to translate the App control topics to device-specific MQTT topics.
 
-# screenshots
+## Login
+
+The App requires login to a LoxBerry server which is running the [LoxBerry JWT Authentication Server](https://github.com/nufke/loxberry-jwt-auth-server). You can register user acounts via the REST-API of this Authentication Server. After successful login, the App will load the MQTT configuration settings from the LoxBerry server.  
+
+## Setup
+
+The LoxBerry MQTT App will listen to `loxberry/app` topics. All control elements in the App are created and configurated dynamically by means of MQTT topics. More information can be found on the [wiki](https://github.com/nufke/ionic-loxberry-mqtt/wiki). The wiki also contains a simple example to get started. 
+
+# Screenshots
 
 <div>
 <img src="screenshots/screenshot_rooms.png" style="width:150px; border: 2px solid #ccc;">
