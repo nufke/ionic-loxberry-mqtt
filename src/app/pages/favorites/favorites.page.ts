@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LoxBerry } from '../../providers/loxberry';
 import { Control } from '../../interfaces/datamodel'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-favorites',
@@ -10,13 +11,17 @@ import { Control } from '../../interfaces/datamodel'
 export class FavoritesPage implements OnInit, OnDestroy {
 
   public controls: Control[];
-
   public favorites: Control[];
+  public user: string;
 
-  constructor(public LoxBerryService: LoxBerry) {
+  private controlsSub: Subscription;
+
+  constructor(
+    public LoxBerryService: LoxBerry) 
+  {
     this.controls = [];
 
-    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
+    this.controlsSub = this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
       this.controls = controls;
 
       this.favorites = controls.filter(item => item.is_favorite)
@@ -30,7 +35,9 @@ export class FavoritesPage implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy() : void {
-    this.LoxBerryService.unload();
+    if (this.controlsSub) {
+      this.controlsSub.unsubscribe();
+    }
   }
 
   private updateControlState(control: any)

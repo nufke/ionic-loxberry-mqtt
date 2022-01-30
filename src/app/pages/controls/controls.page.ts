@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoxBerry } from '../../providers/loxberry';
 import { Control, Category, Room } from '../../interfaces/datamodel'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-controls',
@@ -26,34 +27,40 @@ export class ControlsPage implements OnInit, OnDestroy {
   public itemName: string;
   public key: string;
   
+  private controlsSub: Subscription;
+  private categoriesSub: Subscription;
+  private roomsSub: Subscription;
+
   constructor(public LoxBerryService: LoxBerry,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute ) {
 
     this.domain = this.route.snapshot.paramMap.get('domain');
     this.id = this.route.snapshot.paramMap.get('id');
     this.topic = this.domain+'/' + this.id;
 
-    if (this.domain === 'category')
+    if (this.domain === 'category') {
       this.key = 'room';
+    }
 
-    if (this.domain === 'room')
+    if (this.domain === 'room') {
       this.key = 'category';
+    }
 
-    this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
-      this.controls = controls;
+    this.controlsSub = this.LoxBerryService.getControls().subscribe((controls: Control[]) => {
+    this.controls = controls;
 
-      this.filtered_categories = controls
-        .map(item => item.category )
-        .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
+    this.filtered_categories = controls
+      .map(item => item.category )
+      .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
 
-      this.filtered_rooms = controls
-        .map(item => item.room )
-        .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
+    this.filtered_rooms = controls
+      .map(item => item.room )
+      .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
 
-      this.updateControlState(controls);
-    });
+    this.updateControlState(controls);
+  });
     
-    this.LoxBerryService.getCategories().subscribe((categories: Category[]) => {
+    this.categoriesSub = this.LoxBerryService.getCategories().subscribe((categories: Category[]) => {
       this.categories = categories
       .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); })
       .filter( item => this.filtered_categories.indexOf(item.name) > -1);
@@ -65,7 +72,7 @@ export class ControlsPage implements OnInit, OnDestroy {
         this.items = categories;
     });
 
-    this.LoxBerryService.getRooms().subscribe((rooms: Room[]) => {
+    this.roomsSub = this.LoxBerryService.getRooms().subscribe((rooms: Room[]) => {
       this.rooms = rooms
       .sort((a, b) => { return a.order - b.order || a.name.localeCompare(b.name); })
       .filter( item => this.filtered_rooms.indexOf(item.name) > -1);
@@ -82,6 +89,15 @@ export class ControlsPage implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy() : void {
+    if (this.controlsSub) {
+      this.controlsSub.unsubscribe();
+    }
+    if (this.categoriesSub) {
+      this.categoriesSub.unsubscribe();
+    }
+    if (this.roomsSub) {
+      this.roomsSub.unsubscribe();
+    }
   }
 
   private findName(obj: any, topic:string) {

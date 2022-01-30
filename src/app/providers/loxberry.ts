@@ -4,6 +4,7 @@ import { Subscription, BehaviorSubject, Observable } from 'rxjs';
 import { IMqttMessage, MqttService } from 'ngx-mqtt';
 import { util } from 'node-forge' // TODO check package
 import { Control, Category, Room } from '../interfaces/datamodel'
+import { StorageService } from '../services/storage.service';
 
 @Injectable({  
   providedIn: 'root'
@@ -12,34 +13,59 @@ export class LoxBerry {
 
   private subscription: Subscription[] = [];
   private controls: Control[] = [];
-  private _controls: BehaviorSubject<Control[]> = new BehaviorSubject([]);
-
+  private controlsSubject: BehaviorSubject<Control[]> = new BehaviorSubject([]);
   private categories: Category[] = [];
-  private _categories: BehaviorSubject<Category[]> = new BehaviorSubject([]);
-
+  private categoriesSubject: BehaviorSubject<Category[]> = new BehaviorSubject([]);
   private rooms: Room[] = [];
-  private _rooms: BehaviorSubject<Room[]> = new BehaviorSubject([]);
-  
+  private roomsSubject: BehaviorSubject<Room[]> = new BehaviorSubject([]);
+ 
   private registered_topics: string[] = [];
   
+  private mqttUsername: string = '';
+  private mqttPW: string = '';
+  private mqttPort: string = '';
+  private loxberryIP: string = '';
+
   // TODO move to app configuration
   private registered_topic_prefix = 'loxberry/app';
 
   public getControls() {
-    return this._controls.asObservable();
+    return this.controlsSubject.asObservable();
   }
 
   public getCategories() {
-    return this._categories.asObservable();
+    return this.categoriesSubject.asObservable();
   }
 
   public getRooms() {
-    return this._rooms.asObservable();
+    return this.roomsSubject.asObservable();
   }
 
   constructor(private http: HttpClient,
-              private _mqttService: MqttService) {
-    this.registerTopic(this.registered_topic_prefix+'/settings/set');
+              private mqttService: MqttService,
+              private storageService: StorageService) 
+  {
+    this.storageService.getSettings().subscribe( settings => { 
+      if (settings) {
+        this.loxberryIP = settings.loxberryIP;
+        this.mqttUsername = settings.mqttUsername;
+        this.mqttPort = settings.mqttPort;
+        this.mqttPW = settings.mqttPW;
+        this.connectToMqtt();
+        this.registerTopic(this.registered_topic_prefix+'/settings/set');
+      }
+    });
+  }
+
+  private connectToMqtt() 
+  {
+    this.mqttService.connect(
+    {
+      username: this.mqttUsername,
+      password: this.mqttPW,
+      hostname: this.loxberryIP,
+      port: Number(this.mqttPort)
+    });
   }
 
   private findTopic(data: any, val:string) {
@@ -50,7 +76,7 @@ export class LoxBerry {
   }
 
   private registerTopic(topic: string) {
-    this.subscription.push( this._mqttService.observe(topic)
+    this.subscription.push( this.mqttService.observe(topic)
       .subscribe((message: IMqttMessage) => {
         let mqtt_topic = message.topic.substring(0, message.topic.length - 5); // trim last characters from string
         let msg = message.payload.toString();
@@ -66,9 +92,9 @@ export class LoxBerry {
     this.categories = [];
     this.rooms = [];
 
-    this._controls.next(this.controls); 
-    this._categories.next(this.categories); 
-    this._rooms.next(this.rooms); 
+    this.controlsSubject.next(this.controls); 
+    this.categoriesSubject.next(this.categories); 
+    this.roomsSubject.next(this.rooms); 
   }
 
   // TODO: only items will be added, not removed. 
@@ -109,9 +135,9 @@ export class LoxBerry {
       }
     });
 
-    this._controls.next(this.controls); 
-    this._categories.next(this.categories); 
-    this._rooms.next(this.rooms); 
+    this.controlsSubject.next(this.controls); 
+    this.categoriesSubject.next(this.categories); 
+    this.roomsSubject.next(this.rooms); 
 
     let control_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color",
        "/type", "/category", "/room", "/is_favorite", "/is_visible", "/is_protected", "/order",
@@ -119,9 +145,9 @@ export class LoxBerry {
     let cat_room_sub_topics = [ "/name", "/icon/name", "/icon/href", "/icon/color", "/image",
       "/is_visible", "/is_protected", "/order" ];
 
-    this.registerSubTopics(this.controls, this._controls, 'control', control_sub_topics);
-    this.registerSubTopics(this.categories, this._categories, 'category', cat_room_sub_topics);
-    this.registerSubTopics(this.rooms, this._rooms, 'room', cat_room_sub_topics);
+    this.registerSubTopics(this.controls, this.controlsSubject, 'control', control_sub_topics);
+    this.registerSubTopics(this.categories, this.categoriesSubject, 'category', cat_room_sub_topics);
+    this.registerSubTopics(this.rooms, this.roomsSubject, 'room', cat_room_sub_topics);
   }
 
   
@@ -133,7 +159,7 @@ export class LoxBerry {
         return;
       }
       this.registered_topics.push(full_topic_name);
-      this.subscription.push( this._mqttService.observe(full_topic_name)
+      this.subscription.push( this.mqttService.observe(full_topic_name)
       .subscribe((message: IMqttMessage) => {
         let topic_received = message.topic.replace(this.registered_topic_prefix+'/'+domain_topic+'/', '').split('/');
         let idx = this.findTopic(data, domain_topic+'/'+topic_received[0]);
@@ -168,7 +194,7 @@ export class LoxBerry {
       return;
     }
     
-    this._mqttService.unsafePublish(topic_root+'/state/value', obj.state.value, { qos: 1, retain: false });
+    this.mqttService.unsafePublish(topic_root+'/state/value', obj.state.value, { qos: 1, retain: false });
     console.log('MQTT publish:', topic_root+'/state/value', obj.state.value);
   }
 

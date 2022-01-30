@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthGuard } from '../../guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -9,36 +10,41 @@ const routes: Routes = [
     children: [
       {
         path: 'favorites',
-        loadChildren: () => import('../favorites/favorites.module').then(m => m.FavoritesPageModule)
+        loadChildren: () => import('../favorites/favorites.module').then(m => m.FavoritesPageModule),
+        canLoad: [AuthGuard]
       },
       {
         path: 'rooms',
-        loadChildren: () => import('../rooms/rooms.module').then(m => m.RoomsPageModule)
+        loadChildren: () => import('../rooms/rooms.module').then(m => m.RoomsPageModule),
+        canLoad: [AuthGuard]
       },
       {
         path: 'categories',
-        loadChildren: () => import('../categories/categories.module').then(m => m.CategoriesPageModule)
+        loadChildren: () => import('../categories/categories.module').then(m => m.CategoriesPageModule),
+        canLoad: [AuthGuard]
       },
       {
         path: 'categories/control/:domain/:id',
-        loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule)
+        loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule),
+        canLoad: [AuthGuard]
       },
       {
         path: 'rooms/control/:domain/:id',
-        loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule)
-      },
+        loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule),
+        canLoad: [AuthGuard]
+      } ,
       {
         path: '',
-        redirectTo: '/favorites',
-        pathMatch: 'full'
+        redirectTo: '/login/in',
+        pathMatch: ''
       }
     ]
-  },
+  } /*,
   {
     path: '',
     redirectTo: '/favorites',
     pathMatch: 'full'
-  }
+  }*/
 ];
 
 @NgModule({

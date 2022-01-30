@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
     <ion-title>
       Favorites
     </ion-title>
@@ -7,17 +10,12 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Favorites</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
   <ion-grid>
 
       <ion-row>
         <ion-label>
-          <p translate>Favorites</p>
+          <p translate>Favorites {{user}}</p>
         </ion-label>
       </ion-row>
 
