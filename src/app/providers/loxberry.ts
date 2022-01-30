@@ -26,6 +26,8 @@ export class LoxBerry {
   private mqttPort: string = '';
   private loxberryIP: string = '';
 
+  private mqttConnected: boolean = false;
+
   // TODO move to app configuration
   private registered_topic_prefix = 'loxberry/app';
 
@@ -51,14 +53,18 @@ export class LoxBerry {
         this.mqttUsername = settings.mqttUsername;
         this.mqttPort = settings.mqttPort;
         this.mqttPW = settings.mqttPW;
-        this.connectToMqtt();
-        this.registerTopic(this.registered_topic_prefix+'/settings/set');
+        // only connect if all configuration options are valid
+        if (!this.mqttConnected && this.mqttUsername && this.mqttPW && this.loxberryIP && this.mqttPort) { 
+          this.connectToMqtt();
+          this.registerTopic(this.registered_topic_prefix+'/settings/set');
+        }
       }
     });
   }
 
   private connectToMqtt() 
   {
+    console.log('connectToMqtt');
     this.mqttService.connect(
     {
       username: this.mqttUsername,
@@ -66,6 +72,7 @@ export class LoxBerry {
       hostname: this.loxberryIP,
       port: Number(this.mqttPort)
     });
+    this.mqttConnected = true;
   }
 
   private findTopic(data: any, val:string) {

@@ -85,8 +85,7 @@ export class ApiService {
   }
 
   // Sign in a user and store access and refres token
-  login(credentials: { ipaddress, username, password }): Observable<any> {
-    this.storageService.store({loxberryIP: credentials.ipaddress});
+  login(credentials: { username, password }): Observable<any> {
     return this.http.post(this.loxberryUrl +'/auth/login', credentials).pipe(
       switchMap((tokens: { accessToken, refreshToken }) => {
         this.currentAccessToken = tokens.accessToken;

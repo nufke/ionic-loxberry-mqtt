@@ -75,7 +75,7 @@ export class LoginPage implements OnInit {
       loxberryIP: this.credentials.value.ipaddress, 
       loxberryUsername: this.credentials.value.username,
     });
-    
+
     this.apiService.login(this.credentials.value).subscribe( async _ => {        
         await loading.dismiss();        
         this.router.navigateByUrl('/favorites', { replaceUrl: true });
