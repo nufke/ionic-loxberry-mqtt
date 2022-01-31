@@ -66,7 +66,12 @@ export class LoginPage implements OnInit {
   }
 
   async login() {
-    const loading = await this.loadingController.create();
+    const loading = await this.loadingController.create({
+      cssClass: 'spinner',
+      spinner​: 'crescent',
+      message: 'Please wait...'
+    });
+
     await loading.present();
     
     this.loxberryPW = this.credentials.value.password;
