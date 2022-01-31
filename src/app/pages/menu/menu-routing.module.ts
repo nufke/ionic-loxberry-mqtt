@@ -15,7 +15,7 @@ const routes: Routes = [
       {
         path: 'inside',
         loadChildren: () => import('../inside/inside.module').then( m => m.InsidePageModule),
-        canLoad: [AuthGuard]
+        canActivate: [AuthGuard]
       },
       {
         path: 'about',

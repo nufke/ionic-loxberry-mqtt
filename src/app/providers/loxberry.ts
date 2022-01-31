@@ -201,7 +201,7 @@ export class LoxBerry {
       return;
     }
     
-    this.mqttService.unsafePublish(topic_root+'/state/value', obj.state.value, { qos: 1, retain: false });
+    this.mqttService.unsafePublish(topic_root+'/state/value', obj.state.value, { qos: 1, retain: true });
     console.log('MQTT publish:', topic_root+'/state/value', obj.state.value);
   }
 
