@@ -26,7 +26,8 @@ export class StorageService {
       mqttUsername: null,
       mqttPW: null,
       mqttPort: null,
-      mqttTopicPrefix: null
+      mqttTopicPrefix: null,
+      darkTheme: null
     }
     // load settings from Storage
     this.loadSettings();

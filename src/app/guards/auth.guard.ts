@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanLoad, Router } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 import { ApiService } from '../services/api.service';
 import { Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators'
@@ -7,14 +7,15 @@ import { filter, map, take } from 'rxjs/operators'
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanLoad {
+export class AuthGuard implements CanActivate {
   
   constructor(
     private apiService: ApiService, 
     private router: Router
   ) { }
  
-  canLoad(): Observable<boolean> {    
+  canActivate(): Observable<boolean> {    
+    console.log("canLoad");
     return this.apiService.isAuthenticated.pipe(
       filter(val => val !== null), // Filter out initial Behaviour subject value
       take(1), // Otherwise the Observable doesn't complete!
@@ -24,7 +25,7 @@ export class AuthGuard implements CanLoad {
           return true;
         } else {
           console.log('user not authenticated, revert to home');          
-          this.router.navigateByUrl('/')
+          this.router.navigateByUrl('/');
           return false;
         }
       })

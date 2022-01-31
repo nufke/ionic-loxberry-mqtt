@@ -12,6 +12,7 @@
         <ion-list-header>
           LoxBerry MQTT App 
         </ion-list-header>
+
         <ion-menu-toggle auto-hide="false" *ngFor="let p of Pages; let i = index">
           <ion-item [routerLink]="p.url" routerLinkActive="selected" routerDirection="root" detail="false">
             <ion-icon slot="start" [name]="p.icon"></ion-icon>
@@ -20,6 +21,13 @@
               </ion-label>
           </ion-item>
         </ion-menu-toggle>
+        <ion-item>
+          <ion-icon slot="start" name="moon-outline"></ion-icon>
+          <ion-label>
+            Dark Mode
+          </ion-label>
+          <ion-toggle [(ngModel)]="darkTheme" (ionChange)="onToggleDarkTheme()"></ion-toggle>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ion-menu>

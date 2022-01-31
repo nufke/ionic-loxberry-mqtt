@@ -14,3 +14,7 @@
   //--ion-text-color: #fafafa;
   //--inner-padding-end: 0px;
 }
+
+.md body[color-theme="light"] {
+  --ion-control-color: #d6d6d6;
+}

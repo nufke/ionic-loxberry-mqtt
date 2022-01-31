@@ -13,6 +13,7 @@ ion-item {
   --padding-start: 10px;
   --padding-end: 3px;
   --inner-padding-end: 3px;
+  --color: var(--ion-text-color, #2c2c2c);
   margin: 10px 0 10px 0;
 }
 
@@ -42,10 +43,11 @@ ion-fab-button {
   margin-top: 0px;
   margin-bottom: 0px;
   --border-radius: 40px;
-  --background: var(--ion-avatar-bg-color, #d7d8da);
+  --background: var(--ion-control-color, #353535);
   --box-shadow: 0px;
   --background-activated: var(--ion-color-primary, #000000);
   --background-activated-opacity: 100%;
+  --color: var(--ion-color-primary-contrast, #c9c9c9);
 }
 
 .ion-activated {

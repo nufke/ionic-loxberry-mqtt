@@ -9,5 +9,6 @@ export interface Settings {
   mqttUsername?: string,
   mqttPW?: string,
   mqttPort?: string,
-  mqttTopicPrefix?: string
+  mqttTopicPrefix?: string,
+  darkTheme?: boolean
 }
