@@ -26,11 +26,7 @@ const routes: Routes = [
         loadChildren: () => import('../tabs/tabs.module').then(m => m.TabsPageModule)
       }
     ] 
-  } /*,
-  {
-    path: '',
-    redirectTo: '/favorites',
-  }*/
+  }
 ];
 
 @NgModule({

@@ -16,7 +16,7 @@ export class InsidePage implements OnInit {
   async getData() {
     this.data = null;
 
-    this.apiService.getInfo().then((res: any) => {
+    this.apiService.checkAccessRights().then((res: any) => {
       if (res) {
         this.data = res.message;
         console.log('data', this.data);

@@ -32,19 +32,13 @@ const routes: Routes = [
         path: 'rooms/control/:domain/:id',
         loadChildren: () => import('../controls/controls.module').then(m => m.ControlsPageModule),
         canActivate: [AuthGuard]
-      } ,
+      },
       {
         path: '',
-        redirectTo: '/login/in',
-        pathMatch: ''
+        redirectTo: '/favorites',
       }
     ]
-  } /*,
-  {
-    path: '',
-    redirectTo: '/favorites',
-    pathMatch: 'full'
-  }*/
+  }
 ];
 
 @NgModule({

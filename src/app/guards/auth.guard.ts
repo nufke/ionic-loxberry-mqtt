@@ -14,8 +14,8 @@ export class AuthGuard implements CanActivate {
     private router: Router
   ) { }
  
-  canActivate(): Observable<boolean> {    
-    console.log("canLoad");
+  canActivate(): Observable<boolean> {
+    this.apiService.checkAccessRights(); // Check if Authorization AccessToken is still valid 
     return this.apiService.isAuthenticated.pipe(
       filter(val => val !== null), // Filter out initial Behaviour subject value
       take(1), // Otherwise the Observable doesn't complete!
@@ -24,8 +24,8 @@ export class AuthGuard implements CanActivate {
           console.log('user is authenticated');          
           return true;
         } else {
-          console.log('user not authenticated, revert to home');          
-          this.router.navigateByUrl('/');
+          console.log('user not authenticated, revert to login');          
+          this.router.navigateByUrl('/login/login');
           return false;
         }
       })

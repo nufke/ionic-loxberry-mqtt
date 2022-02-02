@@ -58,14 +58,14 @@ export class MenuPage implements OnInit {
       if (resp) {
         this.Pages[3] =  {
           title: 'Logout',
-          url: '/login/out',
+          url: '/login/logout',
           icon: 'log-out'
         }
       }
       else
       this.Pages[3] =  {
         title: 'Login',
-        url: '/login/in',
+        url: '/login/login',
         icon: 'log-in'
       }
 

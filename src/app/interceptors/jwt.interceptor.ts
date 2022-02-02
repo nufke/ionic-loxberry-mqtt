@@ -2,10 +2,10 @@ import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject, of, from } from 'rxjs';
+import { StorageService } from '../services/storage.service';
 import { ApiService } from '../services/api.service';
 import { catchError, finalize, switchMap, filter, take } from 'rxjs/operators';
 import { ToastController } from '@ionic/angular';
-import { StorageService } from '../services/storage.service';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -31,7 +31,6 @@ export class JwtInterceptor implements HttpInterceptor {
 
   // Intercept every HTTP call
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
     // Check if we need additional token logic or not
     if (this.isInBlockedList(request.url)) {
       return next.handle(request);
@@ -47,6 +46,7 @@ export class JwtInterceptor implements HttpInterceptor {
               case 403:
                 return this.handle403Error(err);
               default:
+                this.handleGeneralError(err);
                 return throwError(err);
             }
           } else {
@@ -57,9 +57,8 @@ export class JwtInterceptor implements HttpInterceptor {
     }
   }
 
-  // Filter out URLs where you don't want to add the token!
+  // Filter out URLs where you don't want to add the token
   private isInBlockedList(url: string): Boolean {
-    // Example: Filter out our login and logout API call
     if (url == `${this.loxberryUrl}/auth` ||
         url == `${this.loxberryUrl}/auth/logout`) {
        return true;
@@ -147,7 +146,6 @@ export class JwtInterceptor implements HttpInterceptor {
 
   // Forbidden (403) message when refresh token expired
   private async handle403Error(err) {
-    console.log(err.error.message);
     const toast = await this.toastCtrl.create({
       message: err.error.message,
       duration: 2000
@@ -157,6 +155,16 @@ export class JwtInterceptor implements HttpInterceptor {
     return of(null);
   }
 
+  private async handleGeneralError(err) {
+    const toast = await this.toastCtrl.create({
+      message: err.message,
+      duration: 2000
+    });
+    toast.present();
+    this.apiService.logout();
+    return of(null);
+  }
+  
 }
 
 

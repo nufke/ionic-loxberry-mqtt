@@ -40,8 +40,9 @@ export class LoginPage implements OnInit {
   }
  
   ngOnInit() {
+    // Check if action is 'login' or 'logout'
     this.action = this.route.snapshot.paramMap.get('action');
-    if (this.action === 'out') this.logout();
+    if (this.action === 'logout') this.logout();
 
     this.credentials = this.fb.group({
       ipaddress: ['', Validators.required],

@@ -47,17 +47,17 @@ export class ApiService {
     }
   }
 
-  getInfo() {
+  // Check if user has valid access token
+  // We do this with requesting a (dummy) private page from the Auth server   
+  checkAccessRights() {
     if (this.accessToken) {
-      console.log("getinfo accessToken:", this.accessToken);
-      console.log("getinfo refreshToken:", this.refreshToken);
       const httpOptions = {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
           'x-access-token': this.accessToken
         })
       }
-      return this.http.get(this.loxberryUrl+'/owner', httpOptions).toPromise();
+      return this.http.get(this.loxberryUrl+'/guest', httpOptions).toPromise();
     }
   }
 
@@ -101,13 +101,13 @@ export class ApiService {
   // Remove all local tokens at the client side
   // and remove refreshToken at server side
   logout() {
-    if (this.refreshToken) // only initiate logout if we have a refreshToken
+    if (this.refreshToken) // only initiate Server logout if we have a refreshToken
       this.http.post(this.loxberryUrl+'/auth/logout', { 'refreshToken': this.refreshToken });
     this.currentAccessToken = null;
-    // Remove all stored tokens
+    // Remove all stored tokens at the client side (independent from Server)
     this.storageService.store({accessToken: null, refreshToken: null});
     this.isAuthenticated.next(false);
-    this.router.navigateByUrl('/', { replaceUrl: true });
+    this.router.navigateByUrl('/login/login', { replaceUrl: true });
   }
 
   // Load the refresh token from storage
