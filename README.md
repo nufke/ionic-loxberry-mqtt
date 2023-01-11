@@ -1,6 +1,6 @@
 # ionic-loxberry-mqtt
 
-** IMPORTANT: This repository is not in active development anymore. Please visit the [LoxBerry PWA](https://github.com/nufke/loxberrypwa) repo for the latest development of the LoxBerry App.**
+**IMPORTANT: This repository is not in active development anymore. Please visit the [LoxBerry PWA](https://github.com/nufke/loxberrypwa) repo for the latest development of the LoxBerry App.**
 
 Early development of a LoxBerry MQTT App.
 
