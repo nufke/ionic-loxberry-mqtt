@@ -1,5 +1,7 @@
 # ionic-loxberry-mqtt
 
+** IMPORTANT: This repository is not in active development anymore. Please visit the [LoxBerry PWA](https://github.com/nufke/loxberrypwa) repo for the latest development of the LoxBerry App.**
+
 Early development of a LoxBerry MQTT App.
 
 **NOTE**: The App will not interact with MQTT devices directly. The MQTT API defined for this App enables the control of the App-specific elements using MQTT. To program hardware devices using this app, you need to run an MQTT-to-MQTT topic translator or a program such as Node-RED to translate the App control topics to device-specific MQTT topics.
